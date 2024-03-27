@@ -1,0 +1,222 @@
+openapi: 3.0.0
+info:
+  title: E-Commerce API
+  description: API documentation for the E-Commerce application
+  version: 1.0.0
+servers:
+  - url: "{{URL}}"
+paths:
+  /auth/login:
+    post:
+      summary: Log in a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Successful login
+        "400":
+          description: Invalid login credentials
+  /auth/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                location:
+                  type: string
+      responses:
+        "201":
+          description: User registration successful
+        "400":
+          description: Invalid request body
+  /products:
+    get:
+      summary: Get all products
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        "200":
+          description: List of products
+    post:
+      summary: Add a new product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                discountPercentage:
+                  type: string
+                rating:
+                  type: number
+                stock:
+                  type: integer
+                brand:
+                  type: string
+                category:
+                  type: string
+      responses:
+        "201":
+          description: Product added successfully
+        "400":
+          description: Invalid request body
+  /products/{productId}:
+    get:
+      summary: Get a product by ID
+      parameters:
+        - name: productId
+          in: path
+          description: ID of the product to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Product details
+        "404":
+          description: Product not found
+    patch:
+      summary: Update a product by ID
+      parameters:
+        - name: productId
+          in: path
+          description: ID of the product to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                discountPercentage:
+                  type: number
+                rating:
+                  type: number
+                stock:
+                  type: integer
+                brand:
+                  type: string
+                category:
+                  type: string
+      responses:
+        "200":
+          description: Product updated successfully
+        "400":
+          description: Invalid request body
+        "404":
+          description: Product not found
+    delete:
+      summary: Delete a product by ID
+      parameters:
+        - name: productId
+          in: path
+          description: ID of the product to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Product deleted successfully
+        "404":
+          description: Product not found
+  /cart:
+    post:
+      summary: Add product to cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productId:
+                  type: string
+                quantity:
+                  type: integer
+      responses:
+        "200":
+          description: Product added to cart successfully
+        "400":
+          description: Invalid request body
+    get:
+      summary: Get cart contents
+      responses:
+        "200":
+          description: Cart contents
+        "404":
+          description: Cart not found
+    delete:
+      summary: Delete cart
+      responses:
+        "200":
+          description: Cart deleted successfully
+        "404":
+          description: Cart not found
+  /orders/checkout:
+    post:
+      summary: Checkout and create order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address:
+                  type: string
+      responses:
+        "201":
+          description: Order created successfully
+        "400":
+          description: Invalid request body
+  /orders:
+    get:
+      summary: Get user orders
+      responses:
+        "200":
+          description: List of user orders
+        "404":
+          description: No orders found
