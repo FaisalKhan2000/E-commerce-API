@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
+import cors from "cors";
 
 // routers
 import productRouter from "./routes/productRouter.js";
@@ -19,6 +20,7 @@ import orderRouter from "./routes/orderRouter.js";
 import errorHandlerMiddleware from "./middleware/errorHandlerMiddleware.js";
 import { authenticateUser } from "./middleware/authMiddleware.js";
 
+app.use(cors());
 app.use(helmet());
 app.use(mongoSanitize());
 app.use(cookieParser());

@@ -8,7 +8,7 @@ const getAllProducts = async (req, res) => {
 
   // query object
   const queryObject = {
-    createdBy: req.user.userId,
+    // createdBy: req.user.userId,
   };
 
   // search
