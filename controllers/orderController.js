@@ -49,23 +49,16 @@ const createOrder = async (req, res) => {
 // confirm order
 const confirmOrder = async (req, res) => {
   const order = await Order.findById(req.params.id);
-  const user = await User.findById(req.user.userId);
 
   if (!order)
     throw new NotFoundError(
       `Cannot find the order with order ID: ${req.params.id}`
     );
 
-  // Create a Stripe customer with the user's email
-  const customer = await stripe.customers.create({
-    email: user.email,
-  });
-
   // Create a payment intent
   const paymentIntent = await stripe.paymentIntents.create({
     amount: order.bill,
     currency: "usd",
-    customer: customer.id,
   });
 
   // if (paymentIntent.status === "succeeded") {
