@@ -18,7 +18,7 @@ import upload from "../middleware/multerMiddleware.js";
 router
   .route("/")
   .get(getAllProducts)
-  .post(upload.array("images", 5), validateProductInput, addProduct);
+  .post(upload.array("images", 10), validateProductInput, addProduct);
 
 router
   .route("/:id")

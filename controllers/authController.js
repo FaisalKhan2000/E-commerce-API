@@ -3,10 +3,27 @@ import { StatusCodes } from "http-status-codes";
 import { UnauthenticatedError } from "../errors/customError.js";
 import { hashPassword, comparePassword } from "../utils/passwordUtils.js";
 import { createJWT } from "../utils/tokenUtils.js";
+import cloudinary from "cloudinary";
 
 const register = async (req, res) => {
-  const isFirstAccount = (await User.countDocuments()) === 0;
+  let imageLink = {};
 
+  if (req.file) {
+    // Assuming only one image is uploaded
+    const file = req.file;
+    const result = await cloudinary.v2.uploader.upload(file.path, {
+      folder: "users",
+    });
+
+    imageLink = {
+      public_id: result.public_id,
+      url: result.secure_url,
+    };
+  }
+
+  req.body.image = imageLink;
+
+  const isFirstAccount = (await User.countDocuments()) === 0;
   req.body.role = isFirstAccount ? "admin" : "user";
 
   const hashedPassword = await hashPassword(req.body.password);
@@ -14,7 +31,7 @@ const register = async (req, res) => {
 
   const user = await User.create(req.body);
 
-  res.status(StatusCodes.CREATED).json({ msg: "user created" });
+  res.status(StatusCodes.CREATED).json({ msg: "User created" });
 };
 
 const login = async (req, res) => {

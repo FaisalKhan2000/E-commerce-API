@@ -64,6 +64,13 @@ export const validateIDParam = withValidationErrors([
     const product = await Product.findById(id);
 
     if (!product) throw new NotFoundError(`no job with id ${id}`);
+
+    const isAdmin = req.user.role === "admin";
+    const isOwner = req.user.userId === product.createdBy.toString();
+
+    if (!isAdmin && !isOwner) {
+      throw new UnauthorizedError("not authorized to access this route");
+    }
   }),
 ]);
 
@@ -99,5 +106,3 @@ export const validateLoginInput = withValidationErrors([
 
   body("password").notEmpty().withMessage("password is required"),
 ]);
-
-

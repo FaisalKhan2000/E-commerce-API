@@ -1,5 +1,13 @@
 import mongoose from "mongoose";
 
+const addressSchema = new mongoose.Schema({
+  street: String,
+  city: String,
+  state: String,
+  country: String,
+  postalCode: String,
+});
+
 const OrderSchema = new mongoose.Schema(
   {
     owner: {
@@ -29,10 +37,7 @@ const OrderSchema = new mongoose.Schema(
       required: true,
       default: 0,
     },
-    address: {
-      type: String,
-      required: true,
-    },
+    address: addressSchema,
     orderStatus: {
       type: String,
       required: true,

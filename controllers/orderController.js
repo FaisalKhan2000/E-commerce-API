@@ -51,18 +51,6 @@ const confirmOrder = async (req, res) => {
       `Cannot find the order with order ID: ${req.params.id}`
     );
 
-  // Create a payment intent
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: order.bill,
-    currency: "usd",
-  });
-
-  if (paymentIntent.status === "succeeded") {
-    order.paymentStatus = "paid";
-    order.orderStatus = "confirmed";
-    await order.save();
-  }
-
   // since we are not using front end we will directly confirm the order
   order.paymentStatus = "paid";
   order.orderStatus = "confirmed";
@@ -70,7 +58,6 @@ const confirmOrder = async (req, res) => {
 
   // Send response with client secret for the payment intent
   res.status(StatusCodes.CREATED).json({
-    clientSecret: paymentIntent.client_secret,
     message: "Order confirmed successfully",
   });
 };

@@ -16,6 +16,7 @@ import productRouter from "./routes/productRouter.js";
 import authRouter from "./routes/authRouter.js";
 import cartRouter from "./routes/cartRouter.js";
 import orderRouter from "./routes/orderRouter.js";
+import userRouter from "./routes/userRouter.js";
 
 // middleware
 import errorHandlerMiddleware from "./middleware/errorHandlerMiddleware.js";
@@ -41,6 +42,7 @@ cloudinary.config({
 app.use("/api/v1/products", authenticateUser, productRouter);
 app.use("/api/v1/cart", authenticateUser, cartRouter);
 app.use("/api/v1/orders", authenticateUser, orderRouter);
+app.use("/api/v1/users", authenticateUser, userRouter);
 app.use("/api/v1/auth", authRouter);
 
 // Not Found
