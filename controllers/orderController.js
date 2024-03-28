@@ -3,10 +3,6 @@ import Cart from "../models/CartModel.js";
 import User from "../models/AuthModel.js";
 import { StatusCodes } from "http-status-codes";
 import { NotFoundError } from "../errors/customError.js";
-import Stripe from "stripe";
-const stripe = new Stripe(
-  "sk_test_51OzEfuSB91cvFDQcU7kpq523DR1tuVjEhr0fzbhkQCNmxtkYKTaetz9IApMNvXx7NPkhnby3xA8rY3D7f2tclHNH00jqtvPIww"
-);
 
 // create order
 const createOrder = async (req, res) => {
