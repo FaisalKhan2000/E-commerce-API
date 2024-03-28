@@ -33,6 +33,16 @@ const OrderSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    orderStatus: {
+      type: String,
+      required: true,
+      default: "not-confirmed",
+    },
+    paymentStatus: {
+      type: String,
+      required: true,
+      default: "unpaid",
+    },
   },
   {
     timestamps: true,

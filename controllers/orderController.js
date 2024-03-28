@@ -2,12 +2,19 @@ import Order from "../models/OrderModel.js";
 import Cart from "../models/CartModel.js";
 import User from "../models/AuthModel.js";
 import { StatusCodes } from "http-status-codes";
+import { NotFoundError } from "../errors/customError.js";
+import Stripe from "stripe";
+const stripe = new Stripe(
+  "sk_test_51OzEfuSB91cvFDQcU7kpq523DR1tuVjEhr0fzbhkQCNmxtkYKTaetz9IApMNvXx7NPkhnby3xA8rY3D7f2tclHNH00jqtvPIww"
+);
 
-const checkout = async (req, res) => {
+// create order
+const createOrder = async (req, res) => {
   const owner = req.user.userId;
 
   // Validate and extract address from request body
   const { address } = req.body;
+
   if (!address) {
     return res.status(StatusCodes.BAD_REQUEST).send("Address is required");
   }
@@ -34,9 +41,109 @@ const checkout = async (req, res) => {
 
   // Send success response with order details
   res.status(StatusCodes.CREATED).json({
-    status: "Payment successful",
+    status: "order created",
     order,
   });
+};
+
+// confirm order
+const confirmOrder = async (req, res) => {
+  const order = await Order.findById(req.params.id);
+  const user = await User.findById(req.user.userId);
+
+  if (!order)
+    throw new NotFoundError(
+      `Cannot find the order with order ID: ${req.params.id}`
+    );
+
+  // Create a Stripe customer with the user's email
+  const customer = await stripe.customers.create({
+    email: user.email,
+  });
+
+  // Create a payment intent
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: order.bill,
+    currency: "usd",
+    customer: customer.id,
+  });
+
+  // if (paymentIntent.status === "succeeded") {
+  //   order.paymentStatus = "paid";
+  //   order.orderStatus = "confirmed";
+  //   await order.save();
+  // }
+
+  // since we are not using front end we will directly confirm the order
+  order.paymentStatus = "paid";
+  order.orderStatus = "confirmed";
+  await order.save();
+
+  // Send response with client secret for the payment intent
+  res.status(StatusCodes.CREATED).json({
+    clientSecret: paymentIntent.client_secret,
+    message: "Order confirmed successfully",
+  });
+};
+
+const processOrder = async (req, res) => {
+  const order = await Order.findById(req.params.id);
+
+  if (!order)
+    throw new NotFoundError(
+      `Cannot find the order with order ID: ${req.params.id}`
+    );
+
+  if (order.paymentStatus === "paid" && order.orderStatus === "confirmed") {
+    order.orderStatus = "processing";
+    await order.save();
+  }
+  res.status(StatusCodes.OK).json({ msg: "order is processed" });
+};
+
+const shipOrder = async (req, res) => {
+  const order = await Order.findById(req.params.id);
+
+  if (!order)
+    throw new NotFoundError(
+      `Cannot find the order with order ID: ${req.params.id}`
+    );
+
+  if (order.paymentStatus === "paid" && order.orderStatus === "processing") {
+    order.orderStatus = "shipping";
+    await order.save();
+  }
+  res.status(StatusCodes.OK).json({ msg: "order is shipped" });
+};
+
+const deliverOrder = async (req, res) => {
+  const order = await Order.findById(req.params.id);
+
+  if (!order)
+    throw new NotFoundError(
+      `Cannot find the order with order ID: ${req.params.id}`
+    );
+
+  if (order.paymentStatus === "paid" && order.orderStatus === "shipping") {
+    order.orderStatus = "delivered";
+    await order.save();
+  }
+  res.status(StatusCodes.OK).json({ msg: "order is delivered" });
+};
+
+const cancelOrder = async (req, res) => {
+  const order = await Order.findById(req.params.id);
+
+  if (!order)
+    throw new NotFoundError(
+      `Cannot find the order with order ID: ${req.params.id}`
+    );
+
+  order.orderStatus = "cancelled";
+  order.paymentStatus = "refunded";
+  await order.save();
+
+  res.status(StatusCodes.OK).json({ msg: "order is cancelled" });
 };
 
 const getOrders = async (req, res) => {
@@ -49,4 +156,12 @@ const getOrders = async (req, res) => {
   }
 };
 
-export { checkout, getOrders };
+export {
+  getOrders,
+  createOrder,
+  confirmOrder,
+  processOrder,
+  shipOrder,
+  deliverOrder,
+  cancelOrder,
+};

@@ -1,0 +1,76 @@
+==> Cart
+
+1. **Get Cart**:
+   - Method: GET
+   - Endpoint: `/cart`
+   - Description: Retrieves the cart for the authenticated user.
+   - User/Admin: User
+
+2. **Add to Cart**:
+   - Method: POST
+   - Endpoint: `/cart/add`
+   - Description: Adds a product to the user's cart.
+   - User/Admin: User
+
+3. **Delete Cart**:
+   - Method: DELETE
+   - Endpoint: `/cart/delete`
+   - Description: Deletes the entire cart for the authenticated user.
+   - User/Admin: User
+
+4. **Delete Product from Cart**:
+   - Method: DELETE
+   - Endpoint: `/cart/delete/:productId`
+   - Description: Deletes a specific product from the user's cart.
+   - User/Admin: User
+
+
+==> Orders
+
+1. **Endpoint to Create Order**:
+   - Purpose: Create a new order after gathering user address and verifying details, then add products from the cart to the order and clear the cart.
+   - Method: POST
+   - Endpoint: `/orders/create`
+   - Parameters: None (User's address and cart details should be included in the request body)
+   - Action: Creates a new order in the database, adds products from the cart to the order, associates user's address, and clears the cart.
+   - Used by the user.
+
+2. **Endpoint to Confirm Order**:
+   - Purpose: Allows the user to confirm their order and initiate payment processing using a payment gateway.
+   - Method: POST
+   - Endpoint: `/orders/{order_id}/confirm`
+   - Parameters: `order_id` (path parameter)
+   - Action: Initiates payment processing using the payment gateway to confirm the order. Upon successful payment, updates the order status from "Pending" to "Confirmed".
+   - Used by the user.
+
+3. **Endpoint to Handle Order Processing**:
+   - Purpose: Update the order status to "Processing" once it's ready to be fulfilled.
+   - Method: POST
+   - Endpoint: `/orders/{order_id}/process`
+   - Parameters: `order_id` (path parameter)
+   - Action: Changes the order status from "Confirmed" to "Processing" to indicate that the order is being prepared for shipment or fulfillment.
+   - Used by the admin.
+
+4. **Endpoint to Mark Order as Shipped**:
+   - Purpose: Update the order status to "Shipped" once it has been dispatched for delivery.
+   - Method: POST
+   - Endpoint: `/orders/{order_id}/ship`
+   - Parameters: `order_id` (path parameter)
+   - Action: Changes the order status from "Processing" to "Shipped" to indicate that the order has been sent to the customer.
+   - Used by the admin.
+
+5. **Endpoint to Confirm Order Delivery**:
+   - Purpose: Update the order status to "Delivered" once it has been successfully delivered to the customer.
+   - Method: POST
+   - Endpoint: `/orders/{order_id}/deliver`
+   - Parameters: `order_id` (path parameter)
+   - Action: Changes the order status from "Shipped" to "Delivered" to indicate that the order has reached its destination.
+   - Used by the admin.
+
+6. **Endpoint to Cancel Order**:
+   - Purpose: Allow cancellation of an order by the admin or customer.
+   - Method: POST
+   - Endpoint: `/orders/{order_id}/cancel`
+   - Parameters: `order_id` (path parameter)
+   - Action: Changes the order status to "Cancelled" to indicate that the order has been cancelled either by the admin or the customer.
+   - Used by both the user and the admin.
