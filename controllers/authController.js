@@ -43,6 +43,7 @@ const login = async (req, res) => {
 
   res.status(StatusCodes.CREATED).json({ msg: "user logged in" });
 };
+
 const logout = async (req, res) => {
   // resetting cookie
   res.cookie("token", "logout", {

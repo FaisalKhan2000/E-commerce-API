@@ -1,6 +1,7 @@
 import Product from "../models/ProductModel.js";
 import { StatusCodes } from "http-status-codes";
 import { NotFoundError } from "../errors/customError.js";
+import cloudinary from "cloudinary";
 
 // GET ALL PRODUCTS
 const getAllProducts = async (req, res) => {
@@ -64,8 +65,55 @@ const getProduct = async (req, res) => {
   res.status(StatusCodes.OK).json({ product });
 };
 
-// ADD PRODUCT
+// // ADD PRODUCT
+// const addProduct = async (req, res) => {
+//   let images = [];
+
+//   if (typeof req.body.images === "string") {
+//     images.push(req.body.images);
+//   } else {
+//     images = req.body.images;
+//   }
+
+//   const imagesLinks = [];
+
+//   for (let i = 0; i < images.length; i++) {
+//     const result = await cloudinary.v2.uploader.upload(images[i], {
+//       folder: "products",
+//     });
+
+//     imagesLinks.push({
+//       public_id: result.public_id,
+//       url: result.secure_url,
+//     });
+//   }
+
+//   req.body.images = imagesLinks;
+//   req.body.createdBy = req.user.userId;
+//   const product = await Product.create(req.body);
+
+//   res.status(StatusCodes.CREATED).json({ product });
+// };
 const addProduct = async (req, res) => {
+  let imagesLinks = [];
+
+  if (req.files && req.files.length > 0) {
+    for (let i = 0; i < req.files.length; i++) {
+      // Process each uploaded file and extract necessary information
+      const file = req.files[i];
+      // Assuming you're using cloudinary for file upload
+      const result = await cloudinary.v2.uploader.upload(file.path, {
+        folder: "products",
+      });
+
+      imagesLinks.push({
+        public_id: result.public_id,
+        url: result.secure_url,
+      });
+    }
+  }
+
+  req.body.images = imagesLinks;
   req.body.createdBy = req.user.userId;
   const product = await Product.create(req.body);
 

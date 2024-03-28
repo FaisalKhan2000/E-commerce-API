@@ -57,11 +57,11 @@ const confirmOrder = async (req, res) => {
     currency: "usd",
   });
 
-  // if (paymentIntent.status === "succeeded") {
-  //   order.paymentStatus = "paid";
-  //   order.orderStatus = "confirmed";
-  //   await order.save();
-  // }
+  if (paymentIntent.status === "succeeded") {
+    order.paymentStatus = "paid";
+    order.orderStatus = "confirmed";
+    await order.save();
+  }
 
   // since we are not using front end we will directly confirm the order
   order.paymentStatus = "paid";

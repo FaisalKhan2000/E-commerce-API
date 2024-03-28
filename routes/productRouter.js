@@ -13,8 +13,13 @@ import {
   validateProductInput,
   validateIDParam,
 } from "../middleware/validationMiddleware.js";
+import upload from "../middleware/multerMiddleware.js";
 
-router.route("/").get(getAllProducts).post(validateProductInput, addProduct);
+router
+  .route("/")
+  .get(getAllProducts)
+  .post(upload.array("images", 5), validateProductInput, addProduct);
+
 router
   .route("/:id")
   .get(validateIDParam, getProduct)
